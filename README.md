@@ -8,3 +8,9 @@ C
 Javascript
 python3
 Lua
+
+
+
+GitHubPagesで試せるもの
+code_memo.html
+https://okhu-mc.github.io/Study-content-by-Okufuku/code_memo.html
