@@ -3,17 +3,24 @@
 <head>
   <title>メモ帳アプリ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 10px; }
+    .entry { margin: 10px 0; display: flex; align-items: center; }
+    .entry span { flex-grow: 1; }
+    button { margin-left: 5px; padding: 5px 10px; font-size: 14px; }
+    input { margin: 5px; padding: 5px; width: 150px; }
+  </style>
 </head>
 <body>
   <h2>メモ帳（クリップボード履歴）</h2>  <a href="https://github.com/OkHu-MC/Study-content-by-Okufuku">GitHubのリンク</a>
   <p>tips:アズレンの装備コード置きとかにも使えるよ（というかメモ帳として使うならid=valueのinputタグはtextareaにすべきである）</p>
+
   <input type="text" id="key" placeholder="キー（名前）">
   <input type="text" id="value" placeholder="値">
   <button onclick="saveData()">保存</button>
-  <button onclick="copyToClipboard()">クリップボードにコピー</button>
-  <button onclick="deleteData()">削除</button>
   <h3>保存済みデータ</h3>
-  <ul id="dataList"></ul>
+  <div id="dataList"></div>
 
   <script>
     // データ保存
@@ -30,31 +37,21 @@
     }
 
     // クリップボードにコピー
-    async function copyToClipboard() {
-      const value = document.getElementById('value').value;
-      if (value) {
-        try {
-          await navigator.clipboard.writeText(value);
-          alert('クリップボードにコピーしました: ' + value);
-        } catch (err) {
-          alert('コピーに失敗しました: ' + err);
-        }
-      } else {
-        alert('値を入力してください');
+    async function copyToClipboard(value) {
+      try {
+        await navigator.clipboard.writeText(value);
+        alert('クリップボードにコピーしました: ' + value);
+      } catch (err) {
+        alert('コピーに失敗しました: ' + err);
       }
     }
 
     // データ削除
-    function deleteData() {
-      const key = document.getElementById('key').value;
-      if (key && localStorage.getItem(key)) {
-        if (window.confirm(`キー "${key}" を削除しますか？`)) {
-          localStorage.removeItem(key);
-          alert('削除しました: ' + key);
-          updateList();
-        }
-      } else {
-        alert('有効なキーを入力してください');
+    function deleteData(key) {
+      if (window.confirm(`キー "${key}" を削除しますか？`)) {
+        localStorage.removeItem(key);
+        alert('削除しました: ' + key);
+        updateList();
       }
     }
 
@@ -65,16 +62,19 @@
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         const value = localStorage.getItem(key);
-        const li = document.createElement('li');
-        li.textContent = `${key}: ${value}`;
-        list.appendChild(li);
+        const div = document.createElement('div');
+        div.className = 'entry';
+        div.innerHTML = `
+          <span>${key}: ${value}</span>
+          <button onclick="copyToClipboard('${value.replace(/'/g, "\\'")}')">Copy</button>
+          <button onclick="deleteData('${key.replace(/'/g, "\\'")}')">Delete</button>
+        `;
+        list.appendChild(div);
       }
     }
 
     // 初期ロード時にリスト更新
     window.onload = updateList;
   </script>
-
-  
 </body>
 </html>
