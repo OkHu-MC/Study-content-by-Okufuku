@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>メモ帳アプリ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <h2>メモ帳（クリップボード履歴）</h2>
+  <p>tips:アズレンの装備コード置きとかにも使えるよ（というかメモ帳として使うならid=valueのinputタグはtextareaにすべきである）</p>
+  <input type="text" id="key" placeholder="キー（名前）">
+  <input type="text" id="value" placeholder="値">
+  <button onclick="saveData()">保存</button>
+  <button onclick="copyToClipboard()">クリップボードにコピー</button>
+  <button onclick="deleteData()">削除</button>
+  <h3>保存済みデータ</h3>
+  <ul id="dataList"></ul>
+
+  <script>
+    // データ保存
+    function saveData() {
+      const key = document.getElementById('key').value;
+      const value = document.getElementById('value').value;
+      if (key && value) {
+        localStorage.setItem(key, value);
+        alert('保存しました: ' + key);
+        updateList();
+      } else {
+        alert('キーまたは値を入力してください');
+      }
+    }
+
+    // クリップボードにコピー
+    async function copyToClipboard() {
+      const value = document.getElementById('value').value;
+      if (value) {
+        try {
+          await navigator.clipboard.writeText(value);
+          alert('クリップボードにコピーしました: ' + value);
+        } catch (err) {
+          alert('コピーに失敗しました: ' + err);
+        }
+      } else {
+        alert('値を入力してください');
+      }
+    }
+
+    // データ削除
+    function deleteData() {
+      const key = document.getElementById('key').value;
+      if (key && localStorage.getItem(key)) {
+        if (window.confirm(`キー "${key}" を削除しますか？`)) {
+          localStorage.removeItem(key);
+          alert('削除しました: ' + key);
+          updateList();
+        }
+      } else {
+        alert('有効なキーを入力してください');
+      }
+    }
+
+    // 保存済みデータ一覧を更新
+    function updateList() {
+      const list = document.getElementById('dataList');
+      list.innerHTML = '';
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const value = localStorage.getItem(key);
+        const li = document.createElement('li');
+        li.textContent = `${key}: ${value}`;
+        list.appendChild(li);
+      }
+    }
+
+    // 初期ロード時にリスト更新
+    window.onload = updateList;
+  </script>
+</body>
+</html>
